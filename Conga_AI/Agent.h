@@ -10,8 +10,8 @@ protected:
 	int maxDepth;
 	unsigned long long nodesExplored = 0;
 	unsigned long long nodesExploredTotal = 0;
-	int nodesPruned = 0;
-	int nodesPrunedTotal = 0;
+	unsigned long long branchesPruned = 0;
+	unsigned long long branchesPrunedTotal = 0;
 	
 	std::chrono::microseconds timeElapsed = (std::chrono::microseconds)0;
 	std::chrono::microseconds timeElapsedTotal = (std::chrono::microseconds)0;

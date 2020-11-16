@@ -6,8 +6,8 @@ class MiniMaxAgent :
 {
 	Color opColor;
 
-	int maxTurn(int depth, Board* board);
-	int minTurn(int depth, Board* board);
+	int maxTurn(int depth, Board* board, int alpha, int beta);
+	int minTurn(int depth, Board* board, int alpha, int beta);
 
 	int (*evaluate)(Board* board, Color color);
 

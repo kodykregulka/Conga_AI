@@ -6,8 +6,8 @@ Agent::Agent(Color setColor, int max_depth)
 	maxDepth = max_depth;
 	nodesExplored = 0;
 	nodesExploredTotal = 0;
-	nodesPruned = 0;
-	nodesPrunedTotal = 0;
+	branchesPruned = 0;
+	branchesPrunedTotal = 0;
 
 }
 
@@ -26,6 +26,7 @@ void Agent::printTurnStats()
 		std::cout.imbue(std::locale(""));
 		std::cout << "Elapsed time: " << std::dec << ((double)timeElapsed.count() / 1000000) << " seconds" << std::endl;
 		std::cout << "Nodes explored: " << std::dec << nodesExplored << std::endl;
+		std::cout << "Branches pruned: " << std::dec << branchesPruned << std::endl;
 		std::cout << "Nodes per second: " << std::dec << nodesExplored / ((double)timeElapsed.count() / 1000000) << " nps" << std::endl;
 	}
 }
@@ -40,5 +41,6 @@ void Agent::printGameStats()
 		std::cout << "Total turn time: " << std::dec << ((double)timeElapsedTotal.count()/1000000) << " seconds" << std::endl;
 		std::cout << "Turn time average: " << std::dec << ((double)(timeElapsedTotal.count())/1000000) / turnCount << " seconds" << std::endl;
 		std::cout << "Total nodes explored: " << std::dec << nodesExploredTotal << std::endl;
+		std::cout << "Total branches pruned: " << std::dec << branchesPrunedTotal << std::endl;
 	}
 }

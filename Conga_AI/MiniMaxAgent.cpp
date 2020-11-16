@@ -16,9 +16,13 @@ Board* MiniMaxAgent::takeTurn(Board* board)
 {
 	auto start = std::chrono::high_resolution_clock::now();
 	nodesExplored = 0;
+	branchesPruned = 0;
+
+	int alpha = INT_MIN;
+	int beta =  INT_MAX;
 	
-	int maxTurnValue = INT_MIN;
-	Board* maxTurnBoard = nullptr;
+	//int maxTurnValue = INT_MIN;
+	Board* alphaBoard = nullptr;
 
 	if (board->isTrapped(Color::black) || board->isTrapped(Color::white))
 		return nullptr;
@@ -46,12 +50,18 @@ Board* MiniMaxAgent::takeTurn(Board* board)
 						{
 							//successor found, explore it
 							nodesExplored++;
-							int currentTurnValue = minTurn(1, nextBoard);
-							if (currentTurnValue > maxTurnValue)
+							int currentTurnValue = minTurn(1, nextBoard, alpha, beta);
+							if (currentTurnValue > alpha)
 							{
-								maxTurnValue = currentTurnValue;
-								if (maxTurnBoard != nullptr) delete maxTurnBoard;
-								maxTurnBoard = nextBoard;
+								alpha = currentTurnValue;
+								if (alphaBoard != nullptr) delete alphaBoard;
+								alphaBoard = nextBoard;
+								
+								if (alpha >= beta)
+								{
+									branchesPruned++;
+									goto FINISH_TAKE_TURN; //gross, but I need to break out of multiple loops
+								}
 							}
 							else
 								delete nextBoard;
@@ -61,18 +71,18 @@ Board* MiniMaxAgent::takeTurn(Board* board)
 			}
 		}
 	}
+	FINISH_TAKE_TURN: 
 	auto stop = std::chrono::high_resolution_clock::now();
 	timeElapsed = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 	timeElapsedTotal += timeElapsed;
 	turnCount++;
 	nodesExploredTotal += nodesExplored;
-	return maxTurnBoard;
+	branchesPrunedTotal += branchesPruned;
+	return alphaBoard;
 }
 
-int MiniMaxAgent::maxTurn(int depth, Board* board)
+int MiniMaxAgent::maxTurn(int depth, Board* board, int alpha, int beta)
 {
-	int maxTurnValue = INT_MIN;
-
 	if (board->isTrapped(color))
 		return INT_MIN;
 
@@ -105,10 +115,15 @@ int MiniMaxAgent::maxTurn(int depth, Board* board)
 						{
 							//successor found, explore it
 							nodesExplored++;
-							int currentTurnValue = minTurn(depth+1, nextBoard);
-							if (currentTurnValue > maxTurnValue)
+							int currentTurnValue = minTurn(depth+1, nextBoard, alpha, beta);
+							if (currentTurnValue > alpha)
 							{
-								maxTurnValue = currentTurnValue;
+								alpha = currentTurnValue;
+								if (alpha >= beta)
+								{
+									branchesPruned++;
+									goto FINISH_MAX_TURN; //gross, but I need to break out of multiple loops
+								}
 							}
 							delete nextBoard;
 						}
@@ -118,18 +133,17 @@ int MiniMaxAgent::maxTurn(int depth, Board* board)
 		}
 	}
 	//if trap condition, make preference for most current traps
-	if (maxTurnValue >= INT_MAX - maxDepth)
-		return maxTurnValue - 1;
-	if (maxTurnValue <= INT_MIN + maxDepth)
-		return maxTurnValue + 1;
+	FINISH_MAX_TURN: 
+	if (alpha >= INT_MAX - maxDepth)
+		return alpha - 1;
+	if (alpha <= INT_MIN + maxDepth)
+		return alpha + 1;
 	else
-		return maxTurnValue;
+		return alpha;
 }
 
-int MiniMaxAgent::minTurn(int depth, Board* board)
+int MiniMaxAgent::minTurn(int depth, Board* board, int alpha, int beta)
 {
-	int minTurnValue = INT_MAX;
-
 	if (board->isTrapped(opColor))
 		return INT_MAX;
 
@@ -162,10 +176,15 @@ int MiniMaxAgent::minTurn(int depth, Board* board)
 						{
 							//successor found, explore it
 							nodesExplored++;
-							int currentTurnValue = maxTurn(depth+1, nextBoard);
-							if (currentTurnValue < minTurnValue)
+							int currentTurnValue = maxTurn(depth+1, nextBoard, alpha, beta);
+							if (currentTurnValue < beta)
 							{
-								minTurnValue = currentTurnValue;
+								beta = currentTurnValue;
+								if (alpha >= beta)
+								{
+									branchesPruned++;
+									goto FINISH_MIN_TURN;
+								}
 							}
 							delete nextBoard;
 						}
@@ -175,12 +194,13 @@ int MiniMaxAgent::minTurn(int depth, Board* board)
 		}
 	}
 	//if trap condition, make preference for most current traps
-	if (minTurnValue >= INT_MAX - maxDepth)
-		return minTurnValue - 1;
-	if (minTurnValue <= INT_MIN + maxDepth)
-		return minTurnValue + 1;
+	FINISH_MIN_TURN: 
+	if (beta >= INT_MAX - maxDepth)
+		return beta - 1;
+	if (beta <= INT_MIN + maxDepth)
+		return beta + 1;
 	else
-		return minTurnValue;
+		return beta;
 }
 
 int MiniMaxAgent::eval_zero(Board* board, Color color)

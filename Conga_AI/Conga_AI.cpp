@@ -55,7 +55,7 @@ int main()
     Board* board = new Board();
     Board* nextBoard = nullptr;
     //h=5 is good
-    Agent* blackAgent = new MiniMaxAgent(Color::black, 5, MiniMaxAgent::eval_blobCount); //goes first
+    Agent* blackAgent = new MiniMaxAgent(Color::black, 8, MiniMaxAgent::eval_blobCount); //goes first
     Agent* whiteAgent = new RandomAgent(Color::white); //goes second
     Agent* currentAgent = nullptr;
 

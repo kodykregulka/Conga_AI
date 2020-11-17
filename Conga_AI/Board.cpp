@@ -86,7 +86,7 @@ bool Board::isValidPlacement(Color color, short col, short row)
 		return false;
 }
 
-Board* Board::genSuccessors(short col, short row, short hor, short vir)
+Board* Board::genSuccessor(short col, short row, short hor, short vir)
 {
 	//assumes square originally pointed to is valid
 	//if move not possible, return nullptr
@@ -191,6 +191,83 @@ bool Board::isTrapped(Color color)
 		}
 	}
 	return true;
+}
+
+int Board::eval_zero(Board* board, Color color)
+{
+	return 0;
+}
+
+int Board::eval_pileCount(Board* board, Color color)
+{
+	int score = 0;
+	for (int row = 0; row < Board::MAX_LENGTH; row++)
+	{
+		for (int col = 0; col < Board::MAX_LENGTH; col++)
+		{
+			Color currentColor = board->getColor(col, row);
+			if (currentColor == color)
+				score++;
+			else if (currentColor != Color::empty) //color is opponent
+				score--;
+		}
+	}
+	return score;
+}
+
+int Board::eval_blobCount(Board* board, Color color)
+{
+	int maxCount = 0;
+	int minCount = 0;
+	bool** visit = new bool* [Board::MAX_LENGTH];
+	for (int i = 0; i < Board::MAX_LENGTH; i++)
+	{
+		visit[i] = new bool[Board::MAX_LENGTH];
+		for (int j = 0; j < Board::MAX_LENGTH; j++)
+		{
+			visit[i][j] = false;
+		}
+	}
+
+	for (int row = 0; row < Board::MAX_LENGTH; row++)
+	{
+		for (int col = 0; col < Board::MAX_LENGTH; col++)
+		{
+			Color currentColor = board->getColor(col, row);
+			if (currentColor == color)
+			{
+				maxCount++;
+				visit[col][row] = true;
+			}
+			else if (currentColor != Color::empty)
+			{
+				minCount++;
+				visit[col][row] = true;
+			}
+			else if (!visit[col][row])
+			{
+				//is empty and not explored yet, now blob explore and count
+				//set up flag pointers
+				bool isMax = false;
+				bool isMin = false;
+
+				//conduct search
+				int blobCount = board->exploreBlob(color, col, row, visit, &isMax, &isMin);
+				if (isMax)
+					maxCount += blobCount;
+				if (isMin)
+					minCount += blobCount;
+			}
+		}
+	}
+	//clean up memory
+	for (int i = 0; i < Board::MAX_LENGTH; i++)
+	{
+		delete[] visit[i];
+	}
+	delete[] visit;
+
+	return maxCount - minCount;
 }
 
 int Board::exploreBlob(Color color, short col, short row, bool** visit, bool* isMax, bool* isMin)

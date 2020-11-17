@@ -6,10 +6,6 @@ MiniMaxAgent::MiniMaxAgent(Color setColor, int max_depth, int (*evalFunction)(Bo
 	opColor = (color == Color::black ? Color::white : Color::black);
 	maxDepth = max_depth;
 	evaluate = evalFunction;
-
-	//timeElapsedTotal = (std::chrono::microseconds)0;
-	//turnCount = 0;
-
 }
 
 Board* MiniMaxAgent::takeTurn(Board* board)
@@ -20,8 +16,7 @@ Board* MiniMaxAgent::takeTurn(Board* board)
 
 	int alpha = INT_MIN;
 	int beta =  INT_MAX;
-	
-	//int maxTurnValue = INT_MIN;
+
 	Board* alphaBoard = nullptr;
 
 	if (board->isTrapped(Color::black) || board->isTrapped(Color::white))
@@ -45,7 +40,7 @@ Board* MiniMaxAgent::takeTurn(Board* board)
 						if (hor == 0 && vir == 0)
 							continue;
 
-						nextBoard = board->genSuccessors(col, row, hor, vir);
+						nextBoard = board->genSuccessor(col, row, hor, vir);
 						if (nextBoard != nullptr)
 						{
 							//successor found, explore it
@@ -110,7 +105,7 @@ int MiniMaxAgent::maxTurn(int depth, Board* board, int alpha, int beta)
 						if (hor == 0 && vir == 0)
 							continue;
 
-						nextBoard = board->genSuccessors(col, row, hor, vir);
+						nextBoard = board->genSuccessor(col, row, hor, vir);
 						if (nextBoard != nullptr)
 						{
 							//successor found, explore it
@@ -171,7 +166,7 @@ int MiniMaxAgent::minTurn(int depth, Board* board, int alpha, int beta)
 						if (hor == 0 && vir == 0)
 							continue;
 
-						nextBoard = board->genSuccessors(col, row, hor, vir);
+						nextBoard = board->genSuccessor(col, row, hor, vir);
 						if (nextBoard != nullptr)
 						{
 							//successor found, explore it
@@ -203,81 +198,5 @@ int MiniMaxAgent::minTurn(int depth, Board* board, int alpha, int beta)
 		return beta;
 }
 
-int MiniMaxAgent::eval_zero(Board* board, Color color)
-{
-	return 0;
-}
-
-int MiniMaxAgent::eval_pileCount(Board* board, Color color)
-{
-	int score = 0;
-	for (int row = 0; row < Board::MAX_LENGTH; row++)
-	{
-		for (int col = 0; col < Board::MAX_LENGTH; col++)
-		{
-			Color currentColor = board->getColor(col, row);
-			if (currentColor == color)
-				score++;
-			else if (currentColor != Color::empty) //color is opponent
-				score--;
-		}
-	}
-	return score;
-}
-
-int MiniMaxAgent::eval_blobCount(Board* board, Color color)
-{
-	int maxCount = 0;
-	int minCount = 0;
-	bool** visit = new bool* [Board::MAX_LENGTH];
-	for (int i = 0; i < Board::MAX_LENGTH; i++)
-	{
-		visit[i] = new bool[Board::MAX_LENGTH];
-		for (int j = 0; j < Board::MAX_LENGTH; j++)
-		{
-			visit[i][j] = false;
-		}
-	}
-
-	for (int row = 0; row < Board::MAX_LENGTH; row++)
-	{
-		for (int col = 0; col < Board::MAX_LENGTH; col++)
-		{
-			Color currentColor = board->getColor(col, row);
-			if (currentColor == color)
-			{
-				maxCount++;
-				visit[col][row] = true;
-			}
-			else if (currentColor != Color::empty)
-			{
-				minCount++;
-				visit[col][row] = true;
-			}
-			else if(!visit[col][row])
-			{
-				//is empty and not explored yet, now blob explore and count
-				//set up flag pointers
-				bool isMax = false;
-				bool isMin = false;
-
-				//conduct search
-				int blobCount = board->exploreBlob(color,col, row, visit, &isMax, &isMin);
-				if (isMax)
-					maxCount += blobCount;
-				if (isMin)
-					minCount += blobCount;
-			}
-		}
-	}
-	//clean up memory
-	for (int i = 0; i < Board::MAX_LENGTH; i++)
-	{
-		delete[] visit[i];
-	}
-	delete[] visit;
-
-	return maxCount - minCount;
-}
 
 

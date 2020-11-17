@@ -37,9 +37,10 @@ void Agent::printGameStats()
 	{
 		std::cout.imbue(std::locale(""));
 		std::cout << colorToString() << " Stats" << std::endl;
-		std::cout << "Turns taken: " << std::dec << turnCount << std::endl;
-		std::cout << "Total turn time: " << std::dec << ((double)timeElapsedTotal.count()/1000000) << " seconds" << std::endl;
-		std::cout << "Turn time average: " << std::dec << ((double)(timeElapsedTotal.count())/1000000) / turnCount << " seconds" << std::endl;
+		std::cout << "Depth: " << maxDepth << std::endl;
+		std::cout << "Moves executed: " << std::dec << turnCount << std::endl;
+		std::cout << "Total move time: " << std::dec << ((double)timeElapsedTotal.count()/1000000) << " seconds" << std::endl;
+		std::cout << "Move time average: " << std::dec << ((double)(timeElapsedTotal.count())/1000000) / turnCount << " seconds" << std::endl;
 		std::cout << "Total nodes explored: " << std::dec << nodesExploredTotal << std::endl;
 		std::cout << "Total branches pruned: " << std::dec << branchesPrunedTotal << std::endl;
 	}

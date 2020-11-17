@@ -40,7 +40,7 @@ Board* RandomAgent::takeTurn(Board* board)
 						 
 						if (h == 0 && v == 0)
 							continue;
-						nextBoard = board->genSuccessors(c, r, h, v);
+						nextBoard = board->genSuccessor(c, r, h, v);
 						if (nextBoard != nullptr)
 						{
 							//successor found

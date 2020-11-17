@@ -156,7 +156,7 @@
   <ItemGroup>
     <ClInclude Include="Agent.h" />
     <ClInclude Include="Board.h" />
-    <ClInclude Include="Enums.h" />
+    <ClInclude Include="AgentColor.h" />
     <ClInclude Include="MiniMaxAgent.h" />
     <ClInclude Include="RandomAgent.h" />
   </ItemGroup>

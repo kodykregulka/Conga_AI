@@ -5,12 +5,14 @@
 #include "RandomAgent.h"
 #include "MiniMaxAgent.h"
 #include "Board.h"
-#include "Enums.h"
+#include "AgentColor.h"
 
 using namespace std;
 
 int main()
 {
+    /*
+    //---------for testing particular board situations---------
     short testData[Board::MAX_LENGTH][Board::MAX_LENGTH] = 
     {
         {0, 0, 0, 0},
@@ -18,7 +20,10 @@ int main()
         {0, 1, 0, 0},
         {5, 1, 0, -10},
     };
-    /*Board* testBoard = new Board(testData);
+    */
+    /* 
+    //---------for testing evaluation functions---------
+    Board* testBoard = new Board(testData);
     
     int maxCount = 0;
     int minCount = 0;
@@ -54,8 +59,7 @@ int main()
     */
     Board* board = new Board();
     Board* nextBoard = nullptr;
-    //h=5 is good
-    Agent* blackAgent = new MiniMaxAgent(Color::black, 8, MiniMaxAgent::eval_blobCount); //goes first
+    Agent* blackAgent = new MiniMaxAgent(Color::black, 8, Board::eval_blobCount); //goes first
     Agent* whiteAgent = new RandomAgent(Color::white); //goes second
     Agent* currentAgent = nullptr;
 
@@ -108,7 +112,7 @@ int main()
     cout << endl;
     whiteAgent->printGameStats();
 
-
+    system("pause");
    
     //possibly manage a limited stack of recent game boards
     //print stack when game ends revealing last n boards before end

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <iostream>
-#include "Enums.h"
+#include "AgentColor.h"
 
 
 class Board
@@ -19,8 +19,12 @@ public:
     void print();
     Color getColor(short col, short row);
     
-    Board* genSuccessors(short col, short row, short hor, short vir);
+    Board* genSuccessor(short col, short row, short hor, short vir);
     bool isTrapped(Color color);
+
+    static int eval_zero(Board* board, Color color);
+    static int eval_pileCount(Board* board, Color color);
+    static int eval_blobCount(Board* board, Color color);
 
     int exploreBlob(Color color, short col, short row, bool** visit, bool* isMax, bool* isMin);
 };

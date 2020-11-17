@@ -38,13 +38,13 @@
     <ClInclude Include="Agent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Enums.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RandomAgent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MiniMaxAgent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AgentColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,3 +1,4 @@
+//RandomAgent.cpp
 #include "RandomAgent.h"
 
 RandomAgent::RandomAgent(Color setColor)
@@ -12,6 +13,11 @@ RandomAgent::RandomAgent(Color setColor)
 
 Board* RandomAgent::takeTurn(Board* board)
 {
+	//randomly selects a square and direction
+	//linearly probs from that square and direction until valid move is found
+	//does not need to be efficient at probing because it is only ever checking all 16 squares in all 8 directions for 1 valid move
+	//stops when valid move is found
+	
 	turnCount++;
 	rng_type::result_type random_row = lengthDist(rng);
 	rng_type::result_type random_col = lengthDist(rng);

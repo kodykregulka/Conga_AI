@@ -1,3 +1,4 @@
+//Board.cpp
 #include "Board.h"
 
 Board::Board()
@@ -97,17 +98,18 @@ Board* Board::genSuccessor(short col, short row, short hor, short vir)
 	if (!isValidPlacement(color, col+hor, row+vir))
 		return nullptr; //not a valid move
 
-	//Now we know the move is valid, create board with that move
+	//Now we know the move is valid, create board with that move (We do not want to mutate original board)
 	Board *nextBoard = new Board(*this);
-	int pileSize = nextBoard->data[col][row];
-	nextBoard->data[col][row] = 0;
-	int modifier = color == Color::black ? 1 : -1;
+	int pileSize = nextBoard->data[col][row]; //how many stones are avalible
+	nextBoard->data[col][row] = 0; //every move always removes all stones from origin square
+	int modifier = (color == Color::black) ? 1 : -1; //black is positive, white negitive
 
 	int nextCol = col;
 	int nextRow = row;
 
 	for (int i = 1; i < MAX_LENGTH; i++)
 	{
+		//update next coordinates
 		nextCol += hor;
 		nextRow += vir;
 
@@ -124,7 +126,7 @@ Board* Board::genSuccessor(short col, short row, short hor, short vir)
 		
 		//make placement
 		int transferWanted = i * modifier;
-		if (pileSize*modifier <= transferWanted*modifier)
+		if (pileSize*modifier <= transferWanted*modifier) //compare absolute values
 		{
 			//not enough in pile
 			//give all of pilesize and break
@@ -132,6 +134,7 @@ Board* Board::genSuccessor(short col, short row, short hor, short vir)
 			pileSize = 0;
 			break;
 		}
+		//enough in pile, transfer wanted then next move
 		pileSize -= transferWanted;
 		nextBoard->data[nextCol][nextRow] += transferWanted;
 		
@@ -151,6 +154,7 @@ bool Board::isTrapped(Color color)
 	//not trapped if
 		//there are any connected piles
 		//there are more than 3 non-connected piles
+
 	//check if 3 or less piles have any valid moves
 
 	//arrays to record pile locations
@@ -166,7 +170,7 @@ bool Board::isTrapped(Color color)
 			if (getColor(col, row) == color) 
 			{
 				if (size >= 3)
-					return false; //more than 3 piles found
+					return false; //more than 3 piles found and cannot be trapped
 				
 				x[size] = col;
 				y[size] = row;
@@ -195,11 +199,14 @@ bool Board::isTrapped(Color color)
 
 int Board::eval_zero(Board* board, Color color)
 {
+	//baseline heuristic that just evaluates leaf nodes to 0
 	return 0;
 }
 
 int Board::eval_pileCount(Board* board, Color color)
 {
+	//heuristic that favors more piles of stones than opponenet
+	//lightweight, but does not encorage owning empty space, just owning squares with stones
 	int score = 0;
 	for (int row = 0; row < Board::MAX_LENGTH; row++)
 	{
@@ -217,9 +224,15 @@ int Board::eval_pileCount(Board* board, Color color)
 
 int Board::eval_blobCount(Board* board, Color color)
 {
+	//heuristic that values owning squares with stones as well as empty space
+	//counts piles like pileCount, but always counts blobs of empty space
+	//blobs are expanded and their areas are summed
+	//blobs also track which color owns/has access to the blob
+	//a shared blob accounts to zero net total
 	int maxCount = 0;
 	int minCount = 0;
-	bool** visit = new bool* [Board::MAX_LENGTH];
+
+	bool** visit = new bool* [Board::MAX_LENGTH]; //tracks which squares have been blob counted
 	for (int i = 0; i < Board::MAX_LENGTH; i++)
 	{
 		visit[i] = new bool[Board::MAX_LENGTH];
@@ -273,6 +286,8 @@ int Board::eval_blobCount(Board* board, Color color)
 int Board::exploreBlob(Color color, short col, short row, bool** visit, bool* isMax, bool* isMin)
 {
 	//assumes that given square is empty
+	//explores all connected empty squares, counting total number
+	//set isMax and isMin flags if a square with specified color is connected
 	int count = 1;
 	visit[col][row] = true;
 	for (int hor = -1; hor < 2; hor++)

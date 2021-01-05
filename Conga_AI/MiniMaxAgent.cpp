@@ -1,3 +1,4 @@
+//MiniMaxAgent.cpp
 #include "MiniMaxAgent.h"
 
 MiniMaxAgent::MiniMaxAgent(Color setColor, int max_depth, int (*evalFunction)(Board*, Color))
@@ -10,6 +11,10 @@ MiniMaxAgent::MiniMaxAgent(Color setColor, int max_depth, int (*evalFunction)(Bo
 
 Board* MiniMaxAgent::takeTurn(Board* board)
 {
+	//set/overhead up for ai turn
+	//acts like a maxTurn, but needs to return board state to main game loop
+	//takeTurn is only run once per turn, whereas min and max are run many times
+	
 	auto start = std::chrono::high_resolution_clock::now();
 	nodesExplored = 0;
 	branchesPruned = 0;
@@ -78,8 +83,11 @@ Board* MiniMaxAgent::takeTurn(Board* board)
 
 int MiniMaxAgent::maxTurn(int depth, Board* board, int alpha, int beta)
 {
+	//ai turn, returns maximumn score
+	//stops processing if score is greater than or equal to beta
+
 	if (board->isTrapped(color))
-		return INT_MIN;
+		return INT_MIN + depth; //prefer recent traps
 
 	if (depth >= maxDepth)
 	{
@@ -117,7 +125,7 @@ int MiniMaxAgent::maxTurn(int depth, Board* board, int alpha, int beta)
 								if (alpha >= beta)
 								{
 									branchesPruned++;
-									goto FINISH_MAX_TURN; //gross, but I need to break out of multiple loops
+									return alpha;
 								}
 							}
 							delete nextBoard;
@@ -127,20 +135,16 @@ int MiniMaxAgent::maxTurn(int depth, Board* board, int alpha, int beta)
 			}
 		}
 	}
-	//if trap condition, make preference for most current traps
-	FINISH_MAX_TURN: 
-	if (alpha >= INT_MAX - maxDepth)
-		return alpha - 1;
-	if (alpha <= INT_MIN + maxDepth)
-		return alpha + 1;
-	else
-		return alpha;
+	return alpha;
 }
 
 int MiniMaxAgent::minTurn(int depth, Board* board, int alpha, int beta)
 {
+	//opponent turn, returns minimumn score
+	//stops processing if score is less than or equal to alpha
+	
 	if (board->isTrapped(opColor))
-		return INT_MAX;
+		return INT_MAX - depth; //prefer recent traps
 
 	if (depth >= maxDepth)
 	{
@@ -178,7 +182,7 @@ int MiniMaxAgent::minTurn(int depth, Board* board, int alpha, int beta)
 								if (alpha >= beta)
 								{
 									branchesPruned++;
-									goto FINISH_MIN_TURN;
+									return beta;
 								}
 							}
 							delete nextBoard;
@@ -188,14 +192,7 @@ int MiniMaxAgent::minTurn(int depth, Board* board, int alpha, int beta)
 			}
 		}
 	}
-	//if trap condition, make preference for most current traps
-	FINISH_MIN_TURN: 
-	if (beta >= INT_MAX - maxDepth)
-		return beta - 1;
-	if (beta <= INT_MIN + maxDepth)
-		return beta + 1;
-	else
-		return beta;
+	return beta;	
 }
 
 
